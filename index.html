@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>G-minutes Generator</title>
+	<link rel="stylesheet" href="main.css">
+</head>
+<body>
+	<h1>G-minutes Generator</h1>
+	<div id="description">
+		<h3>TODO: Description</h3>
+		<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum mollis lectus quis lectus elementum, at vulputate ligula dictum. Maecenas at lectus gravida, pharetra dui eu, euismod lorem. Duis efficitur nisl non congue vestibulum. Morbi auctor pretium erat id cursus. Nam sit amet mattis tortor. Sed tempor diam fringilla lorem pellentesque euismod. Praesent rhoncus, risus mattis feugiat ornare, nibh leo vestibulum massa, sed aliquet quam urna eget massa. Vestibulum imperdiet accumsan elit sit amet interdum. Nam ligula risus, mollis nec dui sed, ultrices suscipit lectus. Mauris urna metus, iaculis sed ante ac, vestibulum mollis sem. Sed varius volutpat risus, eu tincidunt orci feugiat sed. Integer dapibus ipsum quis ex condimentum posuere. </p>
+	</div>
+	<div id="minutes-form">
+		<form action="minutes.php" method="post">
+			Chairperson:<br>
+			<input type="text" name="chair" required><br>
+
+			Secretary:<br>
+			<input type="text" name="secretary" required><br>
+			
+			Location:<br>
+			<input type="text" name="location" required><br>
+			
+			Time opened:<br>
+			<input type="time" name="start_time" step="1" required><br>
+
+			Announcements (one per line):<br>
+			<textarea name="announcements" rows="7" cols="75"></textarea><br>
+
+			New supporting members (one per line):<br>
+			<textarea name="new_members" rows="7" cols="75"></textarea><br>
+			
+			Any other business (one per line):<br>
+			<textarea name="meta" rows="7" cols="75"></textarea><br>
+			
+			Time closed:<br>
+			<input type="time" name="end_time" step="1" required><br>
+
+			<br>
+			<input type="submit" value="Generate minutes">
+			
+		</form>
+	</div>
+</body>
+</html>

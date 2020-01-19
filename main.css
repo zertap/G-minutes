@@ -1,0 +1,14 @@
+body {
+	background-color: #090909;
+	color: #BBB;
+}
+
+h1 {
+	color: #9B111E;
+}
+
+input, textarea {
+	background-color: #333;
+	color: #DDD;
+	border-style: none;
+}
