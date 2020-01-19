@@ -18,6 +18,14 @@ if(
 	die("All required data was not submitted. Please use the form <a href='/G'>here</a>.");
 }
 
+// Create directories if they do not exist.
+if (!file_exists('archive')) {
+    mkdir('archive', 0755, true);
+}
+if (!file_exists('tmp')) {
+    mkdir('tmp', 0755, true);
+}
+
 $chair = $_POST['chair'];
 $secretary = $_POST['secretary'];
 $location = $_POST['location'];
