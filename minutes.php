@@ -26,27 +26,35 @@ if (!file_exists('tmp')) {
     mkdir('tmp', 0755, true);
 }
 
-$chair = $_POST['chair'];
-$secretary = $_POST['secretary'];
-$location = $_POST['location'];
-$start_time = $_POST['start_time'];
-$end_time = $_POST['end_time'];
+// Copy default language if it doesn't exist
+if (!file_exists('language.php')) {
+	copy('language.php.example', 'language.php');
+}
+
+require('language.php');
+
+// Define constants
+define('CHAIR', $_POST['chair']);
+define('SECRETARY', $_POST['secretary']);
+define('LOCATION', $_POST['location']);
+define('START_TIME', $_POST['start_time']);
+define('END_TIME', $_POST['end_time']);
 
 // Check if text areas are empty.
 if (!strlen(trim($_POST['announcements']))) {
-	$announcements = null;	
+	define('ANNOUNCEMENTS', null);
 } else {
-	$announcements = explode("\r\n", $_POST['announcements']);
+	define('ANNOUNCEMENTS', explode("\r\n", $_POST['announcements']));
 }
 if (!strlen(trim($_POST['new_members']))) {
-	$new_members = null;	
+	define('NEW_MEMBERS', null);
 } else {
-	$new_members = explode("\r\n", $_POST['new_members']);
+	define('NEW_MEMBERS', explode("\r\n", $_POST['new_members']));
 }
 if (!strlen(trim($_POST['meta']))) {
-	$meta = null;	
+	define('META', null);
 } else {
-	$meta = explode("\r\n", $_POST['meta']);
+	define('META', explode("\r\n", $_POST['meta']));
 }
 
 function itemize($tag, $items, $tex) {
@@ -59,60 +67,86 @@ function itemize($tag, $items, $tex) {
 	return $tex;
 }
 
-// Generate minutes.tex
-$tex_fi = file_get_contents('template-fi.tex');
+function generate_tex($lang) {
+	$tex = file_get_contents("template.tex");
+	$tex = str_replace('[DATE]', date("c", strtotime(START_TIME)), $tex);
+	$tex = str_replace('[LOCATION_NAME]', LOCATION, $tex);
+	$tex = str_replace('[CHAIR_NAME]', CHAIR, $tex);
+	$tex = str_replace('[SECRETARY_NAME]', SECRETARY, $tex);
+	$tex = str_replace('[START_TIME]', START_TIME, $tex);
+	$tex = str_replace('[END_TIME]', END_TIME, $tex);
+	
+	$tex = str_replace('[MAIN_TITLE]', LANGUAGE[$lang]['MAIN_TITLE'], $tex);
+	$tex = str_replace('[OPENING_TITLE]', LANGUAGE[$lang]['OPENING_TITLE'], $tex);
+	$tex = str_replace('[LEGALITY_TITLE]', LANGUAGE[$lang]['LEGALITY_TITLE'], $tex);
+	$tex = str_replace('[ANNOUNCEMENTS_TITLE]', LANGUAGE[$lang]['ANNOUNCEMENTS_TITLE'], $tex);
+	$tex = str_replace('[NEW_MEMBERS_TITLE]', LANGUAGE[$lang]['NEW_MEMBERS_TITLE'], $tex);
+	$tex = str_replace('[ANY_OTHER_BUSINESS_TITLE]', LANGUAGE[$lang]['ANY_OTHER_BUSINESS_TITLE'], $tex);
+	$tex = str_replace('[CLOSING_THE_MEETING_TITLE]', LANGUAGE[$lang]['CLOSING_THE_MEETING_TITLE'], $tex);
+	
+	$tex = str_replace('[LOCATION]', LANGUAGE[$lang]['LOCATION'], $tex);
+	$tex = str_replace('[TIME]', LANGUAGE[$lang]['TIME'], $tex);
+	$tex = str_replace('[CHAIR]', LANGUAGE[$lang]['CHAIR'], $tex);
+	$tex = str_replace('[SECRETARY]', LANGUAGE[$lang]['SECRETARY'], $tex);
+	
+	$tex = str_replace('[CLOSING_THE_MEETING]', LANGUAGE[$lang]['CLOSING_THE_MEETING'], $tex);
+	$tex = str_replace('[LEGALITY]', LANGUAGE[$lang]['LEGALITY'], $tex);
 
-$tex_fi = str_replace('[DATE]', date("c", strtotime($start_time)), $tex_fi);
-$tex_fi = str_replace('[LOCATION]', $location, $tex_fi);
-$tex_fi = str_replace('[CHAIR]', $chair, $tex_fi);
-$tex_fi = str_replace('[SECRETARY]', $secretary, $tex_fi);
-$tex_fi = str_replace('[START_TIME]', $start_time, $tex_fi);
-$tex_fi = str_replace('[END_TIME]', $end_time, $tex_fi);
 
+	if (ANNOUNCEMENTS !== null) {
+		$tex = itemize('[ANNOUNCEMENTS]', ANNOUNCEMENTS, $tex);
+	} else {
+		$tex = str_replace('[ANNOUNCEMENTS]', LANGUAGE[$lang]['NO_ANNOUNCEMENTS'] ."\n", $tex);
+	}
 
-if ($announcements !== null) {
-	$tex_fi = itemize('[ANNOUNCEMENTS]', $announcements, $tex_fi);
-} else {
-	$tex_fi = str_replace('[ANNOUNCEMENTS]', "Ei ilmoitusasioita\n", $tex_fi);
+	if (NEW_MEMBERS !== null) {
+		$tex = itemize('[NEW_MEMBERS]', NEW_MEMBERS, $tex);
+	} else {
+		$tex = str_replace('[NEW_MEMBERS]', LANGUAGE[$lang]['NO_NEW_MEMBERS'] ."\n", $tex);
+	}
+
+	if (META !== null) {
+		$tex = itemize('[META]', META, $tex);
+	} else {
+		$tex = str_replace('[META]', LANGUAGE[$lang]['NO_META'] ."\n", $tex);
+	}
+
+	return $tex;
 }
 
-if ($new_members !== null) {
-	$tex_fi = itemize('[NEW_MEMBERS]', $new_members, $tex_fi);
-} else {
-	$tex_fi = str_replace('[NEW_MEMBERS]', "Ei uusia kannatusjäseniä\n", $tex_fi);
-}
-
-if ($meta !== null) {
-	$tex_fi = itemize('[META]', $meta, $tex_fi);
-} else {
-	$tex_fi = str_replace('[META]', "Ei muita esille tulevia asioita\n", $tex_fi);
-}
-
-
-// TODO
-// $template_en = file_get_contents('template-en.tex');
-
+// Unique language irrelevant identifier (Will not create duplicates of identical files)
+$name = md5(CHAIR.SECRETARY.LOCATION.START_TIME.END_TIME.ANNOUNCEMENTS.NEW_MEMBERS.META.LANGUAGE);
 // Generate output
-$name = md5($tex_fi);
-file_put_contents("tmp/{$name}-fi.tex", $tex_fi);
-shell_exec("cd tmp/ && /usr/bin/pdflatex {$name}-fi.tex");
-rename("tmp/{$name}-fi.tex", "archive/{$name}-fi.tex");
-rename("tmp/{$name}-fi.pdf", "archive/{$name}-fi.pdf");
-
-echo "<p>PDF: <a href='archive/{$name}-fi.pdf'>FI</a></p>";
+foreach(ENABLED_LANGUAGES as $lang) {
+	$tex = generate_tex($lang);
+	file_put_contents("tmp/{$name}-{$lang}.tex", $tex);
+	shell_exec("cd tmp/ && /usr/bin/pdflatex {$name}-{$lang}.tex");
+	rename("tmp/{$name}-{$lang}.tex", "archive/{$name}-{$lang}.tex");
+	rename("tmp/{$name}-{$lang}.pdf", "archive/{$name}-{$lang}.pdf");
+}
 
 // Cleanup
 array_map('unlink', glob("tmp/*"));
 ?>
+
+<p>
+	PDF:
+	<?php
+	foreach(ENABLED_LANGUAGES as $lang) {
+		echo ("<a href='archive/{$name}-{$lang}.pdf'>". strtoupper($lang) ."</a> ");
+	}
+	?>
+</p>
+
 <!--
-<p>chair: <?php echo($chair);?></p>
-<p>secretary: <?php echo($secretary);?></p>
-<p>location: <?php echo($location);?></p>
-<p>start_time: <?php echo($start_time);?></p>
-<p>end_time: <?php echo($end_time);?></p>
-<p>announcements: <br><?php foreach($announcements as $val) {echo($val.'<br>');};?></p>
-<p>new_members: <br><?php foreach($new_members as $val) {echo($val.'<br>');};?></p>
-<p>meta: <br><?php foreach($meta as $val) {echo($val.'<br>');};?></p>
+<p>chair: <?php echo(CHAIR);?></p>
+<p>secretary: <?php echo(SECRETARY);?></p>
+<p>location: <?php echo(LOCATION);?></p>
+<p>start_time: <?php echo(START_TIME);?></p>
+<p>end_time: <?php echo(END_TIME);?></p>
+<p>announcements: <br><?php foreach(ANNOUNCEMENTS as $val) {echo($val.'<br>');};?></p>
+<p>new_members: <br><?php foreach(NEW_MEMBERS as $val) {echo($val.'<br>');};?></p>
+<p>meta: <br><?php foreach(META as $val) {echo($val.'<br>');};?></p>
 -->
 </body>
 </html>

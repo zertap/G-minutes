@@ -1,0 +1,61 @@
+<?php
+define ('ENABLED_LANGUAGES', array('en', 'fi'));
+
+// Language specific constants.
+// You can define new languages here.
+
+define('LANGUAGE', [
+	// English
+	'en' => [
+		"MAIN_TITLE" => "TAkSiGaYs Supporting Members' meeting",
+		"OPENING_TITLE" => "Opening the meeting",
+		"LEGALITY_TITLE" => "Meeting’s legality and quorum",
+		"ANNOUNCEMENTS_TITLE" => "Announcements and mail",
+		"NEW_MEMBERS_TITLE" => "Accepting new supporting members",
+		"ANY_OTHER_BUSINESS_TITLE" => "Any other business",
+		"CLOSING_THE_MEETING_TITLE" => "Closing the meeting",
+		
+		"LEGALITY" => "Meeting has been called at least a minute before.
+At least one member or supporting member is attending.
+
+Meeting is legal.",
+		"CLOSING_THE_MEETING" => "Meeting was concluded at",
+
+		"LOCATION" => "Location",
+		"TIME" => "Time",
+		"CHAIR" => "Chairperson",
+		"SECRETARY" => "Secretary",
+
+		"NO_ANNOUNCEMENTS" => "No announcements or mail.",
+		"NO_NEW_MEMBERS" => "No new members.",
+		"NO_META" => "No other business."
+	],
+
+	// Finnish
+	'fi' => [
+
+		"MAIN_TITLE" => "TAkSiGaYs Kannatusjäsenten Gokous",
+		"OPENING_TITLE" => "Kokouksen avaus",
+		"LEGALITY_TITLE" => "Kokouksen laillisuus ja päätösvaltaisuus",
+		"ANNOUNCEMENTS_TITLE" => "Ilmoitusasiat ja posti",
+		"NEW_MEMBERS_TITLE" => "Uusien kannatusjäsenten hyväksyminen",
+		"ANY_OTHER_BUSINESS_TITLE" => "Muut esille tulevat asiat",
+		"CLOSING_THE_MEETING_TITLE" => "Kokouksen päättäminen",
+
+		"LEGALITY" => "Kokous on kutsuttu koolle vähintään minuuttia ennen kokousta.
+Paikalla on vähintään yksi kannatusjäsen.
+
+Kokous todetaan lailliseksi ja päätäntävaltaiseksi.",
+		"CLOSING_THE_MEETING" => "Kokous päätettiin ajassa",
+
+		"LOCATION" => "Paikka",
+		"TIME" => "Aika",
+		"CHAIR" => "Puheenjohtaja",
+		"SECRETARY" => "Sihteeri",
+
+		"NO_ANNOUNCEMENTS" => "Ei ilmoitusasioita tai postia.",
+		"NO_NEW_MEMBERS" => "Ei uusia kannatusjäseniä.",
+		"NO_META" => "Ei muita esille tulevia asioita."
+	]
+]);
+?>
